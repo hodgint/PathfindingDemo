@@ -1,4 +1,4 @@
-let GRID_SIZE = 5;
+let GRID_SIZE = 20;
 let DEFAULT_COLOR = "#ffffff"; // white
 let VISITED_COLOR = "#fff700"; //yellow
 let WALL_COLOR = "#777"; // gray
@@ -8,34 +8,48 @@ let PATH_COLOR = "#0015ff"; //blue
 
 /* Object containing everything we need to know about a square in the grid */
 class square {
-  constructor(type, visited, color) {
-    this.type = type;
-    this.visited = visited;
-    this.color = color;
+  constructor(
+    type = "Empty",
+    visited = false,
+    color = DEFAULT_COLOR,
+    cell = null
+  ) {
+    this.type = type; // Empty, Wall, Start, End. Default Empty
+    this.visited = visited; // True/False wether it was visited;
+    this.color = color; // Hex color code;
+    this.cell = cell; // designated cell in the table
   }
 
-  getType() {
-    return this.type;
+  get type() {
+    return this._type;
   }
 
-  getVisited() {
-    return this.visited;
+  get visited() {
+    return this._visited;
   }
 
-  getColor() {
-    return this.color;
+  get color() {
+    return this._color;
   }
 
-  setType(type) {
-    this.type = type;
+  get cell() {
+    return this._cell;
   }
 
-  setVisited(visited) {
-    this.visited = visited;
+  set type(t) {
+    this._type = t;
   }
 
-  setColor(color) {
-    this.color = color;
+  set visited(v) {
+    this._visited = v;
+  }
+
+  set color(clr) {
+    this._color = clr;
+  }
+
+  set cell(c) {
+    this._cell = c;
   }
 }
 
@@ -47,22 +61,23 @@ function createGrid(squares) {
   for (let i = 0; i < GRID_SIZE; ++i) {
     let tr = grid.appendChild(document.createElement("tr"));
     for (let j = 0; j < GRID_SIZE; ++j) {
-      var cell = tr.appendChild(document.createElement("td"));
-      cell.innerHTML = ++c; // this is temporary to test drawing
+      squares[i][j].cell = tr.appendChild(document.createElement("td"));
+      squares[i][j].cell.innerHTML = ++c; // this is temporary to test drawing
       // Add event listener for click
-      cell.addEventListener("click", function() {
+      squares[i][j].cell.addEventListener("click", function() {
         //Check squares at i,j to see if its already a wall/start/end
-        if (squares[i][j].getType() === "Wall") {
-          squares[i][j].setType("Empty");
-          cell.bgColor = DEFAULT_COLOR;
-        } else if (squares[i][j].getType() === "Empty") {
-          squares.setType("Wall");
-          cell.bgColor = WALL_COLOR;
+        if (squares[i][j].type === "Wall") {
+          squares[i][j].type = "Empty";
+          squares[i][j].cell.bgColor = DEFAULT_COLOR;
+        } else if (squares[i][j].type === "Empty") {
+          squares.type = "Wall";
+          squares[i][j].cell.bgColor = WALL_COLOR;
         }
       });
     }
   }
   gridDiv.appendChild(grid);
+  return squares;
 }
 
 $(function() {
@@ -71,7 +86,7 @@ $(function() {
     for (let i = 0; i < GRID_SIZE; i++) {
       squares[i] = [];
       for (let j = 0; j < GRID_SIZE; j++) {
-        squares[i][j] = new square("Empty", false, DEFAULT_COLOR);
+        squares[i][j] = new square();
       }
     }
     createGrid(squares);
