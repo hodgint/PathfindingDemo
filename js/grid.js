@@ -5,6 +5,7 @@ let WALL_COLOR = "#777"; // gray
 let START_COLOR = "17e300"; //green
 let END_COLOR = "#ff0000"; // red
 let PATH_COLOR = "#0015ff"; //blue
+let SET = false;
 
 /* Object containing everything we need to know about a square in the grid */
 class square {
@@ -54,9 +55,14 @@ class square {
 }
 
 function createGrid(squares) {
+  let grid = null;
+  if (SET === true) {
+    $(".grid").remove();
+  }
+  SET = true;
   let c = 0;
   let gridDiv = document.getElementById("grid");
-  let grid = document.createElement("table");
+  grid = document.createElement("table");
   grid.className = "grid";
   for (let i = 0; i < GRID_SIZE; ++i) {
     let tr = grid.appendChild(document.createElement("tr"));
