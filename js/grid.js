@@ -148,13 +148,34 @@ function displayPath(path) {
   }
 }
 
+function findPlacement(cur, squares) {
+  let placement = [2];
+  for (let i = 0; i < GRID_SIZE; i++) {
+    for (let j = 0; j < GRID_SIZE; j++) {
+      if (cur.cellId === squares[i][j].cellId) {
+        placement[0] = i;
+        placement[1] = j;
+      }
+    }
+  }
+}
+
+function checkSearch(cur, search) {
+  for (let i = 0; i < search.length; i++) {
+    if (cur.cellId === search[i].cellId) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function findNeighbors(cur, squares, search) {
   // check i-1, i+1, j-1, j+1 and push onto search array
   let row = 0;
   let col = 0;
   // find where the current node is in the array
-  for (i = 0; i < GRID_SIZE; i++) {
-    for (j = 0; j < GRID_SIZE; j++) {
+  for (let i = 0; i < GRID_SIZE; i++) {
+    for (let j = 0; j < GRID_SIZE; j++) {
       if (squares[i][j].cellId === cur.cellId) {
         row = i;
         col = j;
@@ -166,7 +187,7 @@ function findNeighbors(cur, squares, search) {
   found[1] = false;
   found[2] = false;
   found[3] = false;
-  let path = search;
+  let path = [];
   // check each of the neighbors to see if they are in search
   for (let j = 0; j < search.length; j++) {
     if (row - 1 >= 0) {
@@ -217,7 +238,7 @@ function findNeighbors(cur, squares, search) {
   if (found[3] === false && col + 1 < GRID_SIZE) {
     if (
       squares[row][col + 1].visited === false &&
-      squares[row][col + 1].type != "Wall"
+      squares[row][col + 1].type !== "Wall"
     ) {
       path.push(squares[row][col + 1]);
     }
@@ -225,22 +246,28 @@ function findNeighbors(cur, squares, search) {
   return path;
 }
 
+function backTrace(parent, squares, end) {
+  path = [];
+}
+
 function breadthFirst(squares) {
   let search = [];
   let path = [];
+  let start = squares[STARTI][STARTJ];
   search.push(squares[STARTI][STARTJ]);
   //while (search.length > 0) {
   let step = window.setInterval(function() {
     let node = search.shift(); // get first node;
     path.push(node);
-    console.log("Path: " + path);
+    console.log("Node: " + node.cellId);
     node.visited = true; // visit node
     if (node.type === "Empty") {
       node.cell.bgColor = VISITED_COLOR;
     }
     if (node.type === "End") {
       //found the node, send path
-      displayPath(path);
+      //displayPath(path);
+      backTrace();
       clearInterval(step);
     } else {
       console.log("Searching");
