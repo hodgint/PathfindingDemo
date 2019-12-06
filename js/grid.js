@@ -7,9 +7,9 @@ let END_COLOR = "#ff0000"; // red
 let PATH_COLOR = "#0015ff"; //blue
 let SET = false; // Check for drawn table
 let STARTI = GRID_SIZE / 2;
-let STARTJ = 0;
+let STARTJ = 1;
 let ENDI = GRID_SIZE / 2;
-let ENDJ = GRID_SIZE - 1;
+let ENDJ = GRID_SIZE - 2;
 
 /* Object containing everything we need to know about a square in the grid */
 class square {
@@ -19,7 +19,8 @@ class square {
     visited = false,
     color = DEFAULT_COLOR,
     cell = null,
-    cost = Infinity
+    cost = Infinity,
+    parent = null
   ) {
     this.cellId = cellId;
     this.type = type; // Empty, Wall, Start, End. Default Empty
@@ -27,6 +28,7 @@ class square {
     this.color = color; // Hex color code;
     this.cell = cell; // designated cell in the table
     this.cost = cost;
+    this.parent = parent;
   }
 
   get cellId() {
@@ -53,6 +55,10 @@ class square {
     return this._cost;
   }
 
+  get parent() {
+    return this._parent;
+  }
+
   set cellId(id) {
     this._cellId = id;
   }
@@ -75,6 +81,9 @@ class square {
 
   set cost(cs) {
     this._cost = cs;
+  }
+  set parent(p) {
+    this._parent = p;
   }
 }
 
@@ -144,7 +153,9 @@ function createGrid(squares) {
 }
 function displayPath(path) {
   for (let i = 0; i < path.length; i++) {
-    path[i].cell.bgColor = PATH_COLOR;
+    if (path[1].type !== "End") {
+      path[i].cell.bgColor = PATH_COLOR;
+    }
   }
 }
 
@@ -155,6 +166,7 @@ function findPlacement(cur, squares) {
       if (cur.cellId === squares[i][j].cellId) {
         placement[0] = i;
         placement[1] = j;
+        return placement;
       }
     }
   }
@@ -171,113 +183,94 @@ function checkSearch(cur, search) {
 
 function findNeighbors(cur, squares, search) {
   // check i-1, i+1, j-1, j+1 and push onto search array
-  let row = 0;
-  let col = 0;
+  let placement = findPlacement(cur, squares);
+  let row = placement[0];
+  let col = placement[1];
   // find where the current node is in the array
-  for (let i = 0; i < GRID_SIZE; i++) {
-    for (let j = 0; j < GRID_SIZE; j++) {
-      if (squares[i][j].cellId === cur.cellId) {
-        row = i;
-        col = j;
-      }
-    }
-  }
-  let found = [4]; // bool for if any of the neighbors are found in search
-  found[0] = false;
-  found[1] = false;
-  found[2] = false;
-  found[3] = false;
   let path = [];
   // check each of the neighbors to see if they are in search
-  for (let j = 0; j < search.length; j++) {
-    if (row - 1 >= 0) {
-      if (squares[row - 1][col].cellId === search[j].cellId) {
-        found[0] = true;
-      }
-    }
-    if (row + 1 < GRID_SIZE) {
-      if (squares[row + 1][col].cellId === search[j].cellId) {
-        found[1] = true;
-      }
-    }
-    if (col - 1 >= 0) {
-      if (squares[row][col - 1].cellId === search[j].cellId) {
-        found[2] = true;
-      }
-    }
-    if (col + 1 < GRID_SIZE) {
-      if (squares[row][col + 1].cellId === search[j].cellId) {
-        found[3] = true;
+  if (row - 1 >= 0) {
+    if (checkSearch(squares[row - 1][col], search) === false) {
+      if (
+        squares[row - 1][col].visited === false &&
+        squares[row - 1][col].type != "Wall"
+      ) {
+        squares[row - 1][col].parent = squares[row][col];
+        path.push(squares[row - 1][col]);
       }
     }
   }
-  if (found[0] === false && row - 1 >= 0) {
-    if (
-      squares[row - 1][col].visited === false &&
-      squares[row - 1][col].type != "Wall"
-    ) {
-      path.push(squares[row - 1][col]);
+  if (row + 1 < GRID_SIZE) {
+    if (checkSearch(squares[row + 1][col], search) === false) {
+      if (
+        squares[row + 1][col].visited === false &&
+        squares[row + 1][col].type != "Wall"
+      ) {
+        squares[row + 1][col].parent = squares[row][col];
+        path.push(squares[row + 1][col]);
+      }
     }
   }
-  if (found[1] === false && row + 1 < GRID_SIZE) {
-    if (
-      squares[row + 1][col].visited === false &&
-      squares[row + 1][col].type != "Wall"
-    ) {
-      path.push(squares[row + 1][col]);
+  if (col - 1 >= 0) {
+    if (checkSearch(squares[row][col - 1], search) === false) {
+      if (
+        squares[row][col - 1].visited === false &&
+        squares[row][col - 1].type != "Wall"
+      ) {
+        squares[row][col - 1].parent = squares[row][col];
+        path.push(squares[row][col - 1]);
+      }
     }
   }
-  if (found[2] === false && col - 1 >= 0) {
-    if (
-      squares[row][col - 1].visited === false &&
-      squares[row][col - 1].type != "Wall"
-    ) {
-      path.push(squares[row][col - 1]);
-    }
-  }
-  if (found[3] === false && col + 1 < GRID_SIZE) {
-    if (
-      squares[row][col + 1].visited === false &&
-      squares[row][col + 1].type !== "Wall"
-    ) {
-      path.push(squares[row][col + 1]);
+  if (col + 1 < GRID_SIZE) {
+    if (checkSearch(squares[row][col + 1], search) === false) {
+      if (
+        squares[row][col + 1].visited === false &&
+        squares[row][col + 1].type !== "Wall"
+      ) {
+        squares[row][col + 1].parent = squares[row][col];
+        path.push(squares[row][col + 1]);
+      }
+    } else {
     }
   }
   return path;
 }
 
-function backTrace(parent, squares, end) {
-  path = [];
+function backTrace(end) {
+  let path = [];
+  let cur = end;
+  while (cur.type !== "Start") {
+    path.push(cur);
+    cur = cur.parent;
+  }
+  return path.reverse();
 }
 
 function breadthFirst(squares) {
   let search = [];
   let path = [];
-  let start = squares[STARTI][STARTJ];
   search.push(squares[STARTI][STARTJ]);
-  //while (search.length > 0) {
   let step = window.setInterval(function() {
     let node = search.shift(); // get first node;
     path.push(node);
-    console.log("Node: " + node.cellId);
     node.visited = true; // visit node
     if (node.type === "Empty") {
       node.cell.bgColor = VISITED_COLOR;
     }
     if (node.type === "End") {
-      //found the node, send path
-      //displayPath(path);
-      backTrace();
       clearInterval(step);
+      //found the node, send path
+      let finalPath = backTrace(node);
+      displayPath(finalPath);
     } else {
-      console.log("Searching");
       let neighbors = findNeighbors(node, squares, search);
       search = search.concat(neighbors); // add neighbors to list if not wall, or already visited
     }
   }, 25);
 }
 
-function depthFirst(squares, starti, startj) {
+function depthFirst(squares) {
   let search = [];
   let path = [];
   search.push(squares[STARTI][STARTJ]);
@@ -292,7 +285,7 @@ function depthFirst(squares, starti, startj) {
     }
     if (node.type === "End") {
       //found the node, send path
-      displayPath(path);
+      //displayPath(path);
       clearInterval(step);
     } else {
       console.log("Searching");
