@@ -11,6 +11,8 @@ let STARTJ = 1;
 let ENDI = 1;
 let ENDJ = 2;
 let intervalId;
+let toggleStart = false;
+let toggleEnd = false;
 
 /* Object containing everything we need to know about a square in the grid */
 class square {
@@ -124,6 +126,22 @@ function createGrid(squares) {
   if (SET === true) {
     $(".grid").remove();
   }
+  $("#setStart").click(function() {
+    if (toggleEnd === false) {
+      toggleStart = !toggleStart;
+    } else {
+      toggleStart = false;
+    }
+  });
+
+  $("#setEnd").click(function() {
+    if (toggleStart === false) {
+      toggleEnd = !toggleEnd;
+    } else {
+      toggleEnd = false;
+    }
+  });
+
   SET = true;
   let c = 0;
   let gridDiv = document.getElementById("grid");
@@ -140,6 +158,24 @@ function createGrid(squares) {
         "click",
         function(event) {
           //Check squares at i,j to see if its already a wall/start/end
+          if (toggleStart) {
+            squares[STARTI][STARTJ].type = "Empty";
+            squares[STARTI][STARTJ].cell.bgColor = DEFAULT_COLOR;
+            squares[i][j].type = "Start";
+            squares[i][j].cell.bgColor = START_COLOR;
+            STARTI = i;
+            STARTJ = j;
+            toggleStart = false;
+          }
+          if (toggleEnd) {
+            squares[ENDI][ENDJ].type = "Empty";
+            squares[i][j].type = "End";
+            squares[ENDI][ENDJ].cell.bgColor = DEFAULT_COLOR;
+            squares[i][j].cell.bgColor = END_COLOR;
+            ENDI = i;
+            ENDJ = j;
+            toggleEnd = false;
+          }
           if (squares[i][j].type === "Wall") {
             squares[i][j].type = "Empty";
             squares[i][j].cell.bgColor = DEFAULT_COLOR;
