@@ -3,5 +3,5 @@
 Visualization of many pathfinding algorithms. 
 
 Currently implemented algorithms:
-  -Breadth First
+  - Breadth First
   - Depth First
