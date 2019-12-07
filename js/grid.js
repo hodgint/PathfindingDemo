@@ -361,6 +361,9 @@ function breadthFirst(squares, interval) {
       let neighbors = findNeighbors(node, squares, search);
       search = search.concat(neighbors); // add neighbors to list if not wall, or already visited
     }
+    if (search.length === 0) {
+      alert("No path found");
+    }
   }, interval);
 }
 
@@ -389,7 +392,10 @@ function depthFirst(squares) {
       let neighbors = findNeighbors(node, squares, search);
       search = search.concat(neighbors); // add neighbors to list if not wall, or already visited
     }
-  }, interval);
+    if (search.length === 0) {
+      alert("No path found");
+    }
+  }, 25);
 }
 
 /* references to each algorithm */
