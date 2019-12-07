@@ -1,18 +1,29 @@
-let GRID_SIZE = 20;
-let DEFAULT_COLOR = "#ffffff"; // white
-let VISITED_COLOR = "#fff700"; //yellow
-let WALL_COLOR = "#777"; // gray
-let START_COLOR = "17e300"; //green
+/**************************************
+ * File: grid.js
+ * Name: Travis Hodgin
+ * Desc: Calculates and displays
+ *       several pathfinding algorithms
+ **************************************/
+/* Global Checks */
+let SET = false; // Check for drawn table
+let GRID_SIZE = 20; //size of the grid will be  GRID_SIZE * GRIDSIZE
+let toggleStart = false;
+let toggleEnd = false;
+let intervalId;
+
+/* color definitions */
+let DEFAULT_COLOR = "#ffffff";
+let VISITED_COLOR = "#fff700";
+let WALL_COLOR = "#777";
+let START_COLOR = "17e300"; //gre
 let END_COLOR = "#ff0000"; // red
 let PATH_COLOR = "#0015ff"; //blue
-let SET = false; // Check for drawn table
+
+/* Starting positions for important nodes */
 let STARTI = GRID_SIZE / 2;
 let STARTJ = 1;
 let ENDI = 1;
 let ENDJ = 2;
-let intervalId;
-let toggleStart = false;
-let toggleEnd = false;
 
 /* Object containing everything we need to know about a square in the grid */
 class square {
@@ -92,6 +103,8 @@ class square {
 
 /*
  * Sets the start and end of the path to be middle row, on the ends of the column
+ * Inputs:
+ *      -squares: array of objects representing each square of the board
  */
 function setStartAndEnd(squares) {
   squares[STARTI][STARTJ].type = "Start";
@@ -100,6 +113,12 @@ function setStartAndEnd(squares) {
   squares[ENDI][ENDJ].cell.bgColor = END_COLOR;
 }
 
+/*
+ * returns a random integer between the given numbers
+ * Inputs:
+ *     - high: high end of the range
+ *     - low: low end of the range
+ */
 function randInt(high, low) {
   return Math.floor(Math.random() * (high - low) + low);
 }
@@ -119,6 +138,8 @@ function randomWalls(squares) {
 
 /*
  * Sets up the clickable grid and displays on the page
+ * Inputs:
+ *      - squares: array of objects representing each square of the board
  */
 function createGrid(squares) {
   let grid = null;
@@ -192,6 +213,11 @@ function createGrid(squares) {
   setStartAndEnd(squares);
 }
 
+/*
+ * Changes the squares of the board that represent the path
+ * Inputs:
+ *     - path: list of nodes that represent a path
+ */
 function displayPath(path) {
   for (let i = 0; i < path.length; i++) {
     if (path[i].type !== "End") {
@@ -200,6 +226,12 @@ function displayPath(path) {
   }
 }
 
+/*
+ * Finds the i, j value for the current node in the squares array
+ * Inputs:
+ *     - cur: current tnode we are at
+ *     - squares: array of objects representing each square of the board
+ */
 function findPlacement(cur, squares) {
   let placement = [2];
   for (let i = 0; i < GRID_SIZE; i++) {
@@ -213,6 +245,12 @@ function findPlacement(cur, squares) {
   }
 }
 
+/*
+ * Checks the search array to see if the current node is already in it.
+ * Inputs:
+ *     -cur: current node we are at
+ *     - search: array of nodes that we are searching on
+ */
 function checkSearch(cur, search) {
   for (let i = 0; i < search.length; i++) {
     if (cur.cellId === search[i].cellId) {
@@ -222,6 +260,13 @@ function checkSearch(cur, search) {
   return false;
 }
 
+/*
+ * Finds the neighbors around the current node. Will check above, right, left and below.
+ * Inputs:
+ *     - cur: current node we are at
+ *     - squares: array of objects representing each square of the board
+ *     - searhc: array of nodes that we will search on
+ */
 function findNeighbors(cur, squares, search) {
   // check i-1, i+1, j-1, j+1 and push onto search array
   let placement = findPlacement(cur, squares);
@@ -278,6 +323,9 @@ function findNeighbors(cur, squares, search) {
   return path;
 }
 
+/*
+ * Finds path by tracing from end to start.
+ */
 function backTrace(end) {
   let path = [];
   let cur = end;
@@ -288,6 +336,11 @@ function backTrace(end) {
   return path.reverse();
 }
 
+/*
+ * Depth first algorithm to find path from start to end.
+ * Input:
+ *   -Squares: array of objects representing each square of the board.
+ */
 function breadthFirst(squares, interval) {
   let search = [];
   let path = [];
@@ -311,6 +364,11 @@ function breadthFirst(squares, interval) {
   }, interval);
 }
 
+/*
+ * Depth first algorithm to find path from start to end.
+ * Input:
+ *   -Squares: array of objects represeting each square of the board.
+ */
 function depthFirst(squares) {
   let search = [];
   let path = [];
@@ -334,15 +392,43 @@ function depthFirst(squares) {
   }, interval);
 }
 
+/* references to each algorithm */
 let algorithms = {
   breadth: breadthFirst,
   depth: depthFirst
 };
 
+/* descriptions for each algorithm */
+let descriptions = {
+  breadth:
+    "Breadth first searches by looking at each nodes neighbors first. This algorithm will find the shortest path.",
+  depth:
+    "Depth first seaches by going down a row as far as it can, and then going moving over rows. This algorithm will not always find the shortest path as it checks the deepest node first."
+};
+
+/* pseudo code for each algorithm */
+let code = {
+  breadth: "code for breadth first",
+  depth: "code for depth first"
+};
+
+/* retrives the algorithm to use. */
 function getAlgorithms(alg) {
   return algorithms[alg];
 }
 
+/* Gets the description for the given algorithm */
+function getDescriptions(alg) {
+  return descriptions[alg];
+}
+/* Gets the pseudo code for given algorithm */
+function getCode(alg) {
+  return code[alg];
+}
+
+/*
+ * resets the board by resetting color and visited.
+ */
 function reset(squares) {
   toggleStart = false;
   toggleEnd = false;
@@ -368,11 +454,25 @@ $(function() {
   }
   let interval = parseInt($("#interval").val());
   createGrid(squares);
+  //set the description and pseudo code for the default top
+  let alg = $("#algoSelect").val();
+  $("#description").text(getDescriptions(alg));
+  $("#code").text(getCode(alg));
+
+  //add random walls
   $("#randWalls").click(function() {
     reset(squares);
     randomWalls(squares);
   });
 
+  //changes description and pseudo code when user changes algorithms
+  $("#algoSelect").change(function() {
+    let alg = $("#algoSelect").val();
+    $("#description").text(getDescriptions(alg));
+    $("#code").text(getCode(alg));
+  });
+
+  //resets board and stops currently running algorithm
   $("#clear").click(function() {
     if (intervalId) {
       clearInterval(intervalId);
@@ -388,6 +488,7 @@ $(function() {
     createGrid(squares);
   });
 
+  //starts running algorithm and displays
   $("#start").click(function() {
     reset(squares);
     let alg = $("#algoSelect").val();
