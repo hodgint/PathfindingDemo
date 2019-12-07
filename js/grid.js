@@ -92,7 +92,6 @@ class square {
  * Sets the start and end of the path to be middle row, on the ends of the column
  */
 function setStartAndEnd(squares) {
-  let mid = Math.floor(GRID_SIZE / 2);
   squares[STARTI][STARTJ].type = "Start";
   squares[STARTI][STARTJ].cell.bgColor = START_COLOR;
   squares[ENDI][ENDJ].type = "End";
@@ -156,6 +155,7 @@ function createGrid(squares) {
   gridDiv.appendChild(grid);
   setStartAndEnd(squares);
 }
+
 function displayPath(path) {
   for (let i = 0; i < path.length; i++) {
     if (path[i].type !== "End") {
@@ -196,9 +196,6 @@ function findNeighbors(cur, squares, search) {
   // check each of the neighbors to see if they are in search
   if (row - 1 >= 0) {
     if (checkSearch(squares[row - 1][col], search) === false) {
-      if (squares[row - 1][col].type === "Wall") {
-        console.log("WALL");
-      }
       if (
         squares[row - 1][col].visited === false &&
         squares[row - 1][col].type !== "Wall"
@@ -282,26 +279,23 @@ function depthFirst(squares) {
   let search = [];
   let path = [];
   search.push(squares[STARTI][STARTJ]);
-  //while (search.length > 0) {
-  intervalId = setInterval(function() {
+  let step = window.setInterval(function() {
     let node = search.pop(0); // get first node;
     path.push(node);
-    console.log("Path: " + path);
     node.visited = true; // visit node
     if (node.type === "Empty") {
       node.cell.bgColor = VISITED_COLOR;
     }
     if (node.type === "End") {
-      //found the node, send path
       clearInterval(step);
+      //found the node, send path
       let finalPath = backTrace(node);
       displayPath(finalPath);
     } else {
-      console.log("Searching");
       let neighbors = findNeighbors(node, squares, search);
       search = search.concat(neighbors); // add neighbors to list if not wall, or already visited
     }
-  }, 25);
+  }, interval);
 }
 
 let algorithms = {
@@ -314,10 +308,9 @@ function getAlgorithms(alg) {
 }
 
 function reset(squares) {
-  console.log("SQUARES: " + squares);
   if (squares) {
-    for (let i = 0; i < GRID_SIZE - 1; i++) {
-      for (let j = 0; j < GRID_SIZE - 1; j++) {
+    for (let i = 0; i < GRID_SIZE; i++) {
+      for (let j = 0; j < GRID_SIZE; j++) {
         squares[i][j].visited = false;
         if (squares[i][j].type === "Empty") {
           squares[i][j].cell.bgColor = DEFAULT_COLOR;
@@ -338,7 +331,7 @@ $(function() {
   let interval = parseInt($("#interval").val());
   createGrid(squares);
   $("#randWalls").click(function() {
-    reset();
+    reset(squares);
     randomWalls(squares);
   });
 
@@ -346,12 +339,19 @@ $(function() {
     if (intervalId) {
       clearInterval(intervalId);
     }
+    squares = null;
+    squares = [];
+    for (let i = 0; i < GRID_SIZE; i++) {
+      squares[i] = [];
+      for (let j = 0; j < GRID_SIZE; j++) {
+        squares[i][j] = new square();
+      }
+    }
     createGrid(squares);
-    reset();
   });
 
   $("#start").click(function() {
-    reset();
+    reset(squares);
     let alg = $("#algoSelect").val();
     let pathFunction = getAlgorithms(alg);
     pathFunction(squares, interval);
