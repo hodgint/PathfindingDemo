@@ -2,8 +2,13 @@
   padding: 10px;
 }
 
+#mainPage {
+  width: 75rem;
+  margin: auto;
+}
+
 .grid {
-  margin: 1em auto;
+  /* margin: 0.5em auto; */
   border-collapse: collapse;
 }
 
