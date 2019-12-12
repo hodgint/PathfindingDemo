@@ -172,7 +172,8 @@ function createGrid(squares) {
     let tr = grid.appendChild(document.createElement("tr"));
     for (let j = 0; j < GRID_SIZE; ++j) {
       squares[i][j].cell = tr.appendChild(document.createElement("td"));
-      squares[i][j].cell.innerHTML = ++c; // this is temporary to test drawing
+      //squares[i][j].cell.innerHTML = ++c; // this is temporary to test drawing
+      c++;
       squares[i][j].cellId = c;
       // Add event listener for click
       squares[i][j].cell.addEventListener(
@@ -224,6 +225,9 @@ function displayPath(path) {
       path[i].cell.bgColor = PATH_COLOR;
     }
   }
+  //re-enable sets
+  document.getElementById("setStart").disabled = false;
+  document.getElementById("setEnd").disabled = false;
 }
 
 /*
@@ -337,11 +341,14 @@ function backTrace(end) {
 }
 
 /*
- * Depth first algorithm to find path from start to end.
+ * Breadth first algorithm to find path from start to end.
  * Input:
  *   -Squares: array of objects representing each square of the board.
  */
 function breadthFirst(squares, interval) {
+  // disable set start and end buttons so you can't do set them while alg is running
+  document.getElementById("setStart").disabled = true;
+  document.getElementById("setEnd").disabled = true;
   let search = [];
   let path = [];
   search.push(squares[STARTI][STARTJ]);
@@ -372,7 +379,10 @@ function breadthFirst(squares, interval) {
  * Input:
  *   -Squares: array of objects represeting each square of the board.
  */
-function depthFirst(squares) {
+function depthFirst(squares, interval) {
+  // disable set start and end buttons so you can't do set them while alg is running
+  document.getElementById("setStart").disabled = true;
+  document.getElementById("setEnd").disabled = true;
   let search = [];
   let path = [];
   search.push(squares[STARTI][STARTJ]);
@@ -395,7 +405,7 @@ function depthFirst(squares) {
     if (search.length === 0) {
       alert("No path found");
     }
-  }, 25);
+  }, interval);
 }
 
 /* references to each algorithm */
@@ -450,7 +460,12 @@ function reset(squares) {
   }
 }
 
+/* Button functionality */
 $(function() {
+  // open modal on page load
+  $(window).on("load", function() {
+    $("#instructions").modal("show");
+  });
   let squares = [];
   for (let i = 0; i < GRID_SIZE; i++) {
     squares[i] = [];
@@ -458,9 +473,8 @@ $(function() {
       squares[i][j] = new square();
     }
   }
-  let interval = parseInt($("#interval").val());
   createGrid(squares);
-  //set the description and pseudo code for the default top
+  //set the description and pseudo code for the default top value
   let alg = $("#algoSelect").val();
   $("#description").text(getDescriptions(alg));
   $("#code").text(getCode(alg));
@@ -473,6 +487,8 @@ $(function() {
 
   //changes description and pseudo code when user changes algorithms
   $("#algoSelect").change(function() {
+    toggleStart = false;
+    toggleStart = false;
     let alg = $("#algoSelect").val();
     $("#description").text(getDescriptions(alg));
     $("#code").text(getCode(alg));
@@ -480,6 +496,10 @@ $(function() {
 
   //resets board and stops currently running algorithm
   $("#clear").click(function() {
+    document.getElementById("setStart").disabled = false;
+    document.getElementById("setEnd").disabled = false;
+    toggleStart = false;
+    toggleStart = false;
     if (intervalId) {
       clearInterval(intervalId);
     }
@@ -496,6 +516,9 @@ $(function() {
 
   //starts running algorithm and displays
   $("#start").click(function() {
+    let interval = parseInt($("#interval").val());
+    toggleStart = false;
+    toggleStart = false;
     reset(squares);
     let alg = $("#algoSelect").val();
     let pathFunction = getAlgorithms(alg);

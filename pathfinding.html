@@ -18,6 +18,7 @@
                 </nav>  
             </nav>
         </div>
+        <!-- side panel-->
         <div class='container-fluid'>
             <div class='row'>
                 <!-- Left side panel-->
@@ -28,7 +29,6 @@
                             <option value='breadth'>Breadth First</option>
                             <option value='depth'>Depth First</option>
                         </select>
-                        
                     </div>
                     <div class='form-group'>
                             <label for='#interval'>Interval (ms)</label>
@@ -42,11 +42,12 @@
                             <br>
                             <button class="btn btn-lg btn-primary" id='setStart'>Set Start</button>
                             <button class="btn btn-lg btn-danger" id='setEnd'>Set end</button>
-
+                            <button type="button" class="btn btn-lg btn-dark" data-toggle="modal" data-target="#instructions">Instructions</button>
                     </div>
                 </div>
                  <div class='col-lg' id='grid'>
                 </div>
+                <!-- Explanation and code -->
                 <div class='col'>
                     <div class='card'>
                         <div class='card-header'>
@@ -65,6 +66,40 @@
                                 <p id='code'> change for each algorithm</p>
                             </div>
                         </div>
+                </div>
+                <!-- Instructions modal -->
+                <div class="modal fade" id="instructions">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="instructionsTitle">Instructions</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                    <p>
+                                    To get started Select an algorithm and hit start.
+                                    Walls can be generated from the Random Walls button or by clicking on a square.
+                                    if you want to slow down, or speed up the visualization, feel free to change the interval.
+                                    if you want to change the start or end positions, click the respective button, and then click on a square to set it.
+                                </p>
+                                <section>
+                                    <p>Color Meaning:</p> 
+                                        <ul> 
+                                            <li>Green: Start position</li>
+                                            <li>Red: End position</li>
+                                            <li>Yellow: Visited square</li>
+                                            <li>Blue: Part of a Path between start and end</li>
+                                        </ul>
+                                </section>
+                                      
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">close</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
         </div>
     </body>
