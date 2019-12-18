@@ -4,6 +4,7 @@
  * Desc: Calculates and displays
  *       several pathfinding algorithms
  **************************************/
+
 /* Global Checks */
 let SET = false; // Check for drawn table
 let GRID_SIZE = 20; //size of the grid will be  GRID_SIZE * GRIDSIZE
@@ -162,7 +163,6 @@ function createGrid(squares) {
       toggleEnd = false;
     }
   });
-
   SET = true;
   let c = 0;
   let gridDiv = document.getElementById("grid");
@@ -226,8 +226,7 @@ function displayPath(path) {
     }
   }
   //re-enable sets
-  document.getElementById("setStart").disabled = false;
-  document.getElementById("setEnd").disabled = false;
+  setButtonsOff();
 }
 
 /*
@@ -347,8 +346,7 @@ function backTrace(end) {
  */
 function breadthFirst(squares, interval) {
   // disable set start and end buttons so you can't do set them while alg is running
-  document.getElementById("setStart").disabled = true;
-  document.getElementById("setEnd").disabled = true;
+  setButtonsOff();
   let search = [];
   let path = [];
   search.push(squares[STARTI][STARTJ]);
@@ -364,12 +362,15 @@ function breadthFirst(squares, interval) {
       //found the node, send path
       let finalPath = backTrace(node);
       displayPath(finalPath);
+      setButtonsOn();
     } else {
       let neighbors = findNeighbors(node, squares, search);
       search = search.concat(neighbors); // add neighbors to list if not wall, or already visited
     }
     if (search.length === 0) {
       alert("No path found");
+      setButtonsOff();
+      clearInterval(step);
     }
   }, interval);
 }
@@ -381,8 +382,7 @@ function breadthFirst(squares, interval) {
  */
 function depthFirst(squares, interval) {
   // disable set start and end buttons so you can't do set them while alg is running
-  document.getElementById("setStart").disabled = true;
-  document.getElementById("setEnd").disabled = true;
+  setButtonsOff();
   let search = [];
   let path = [];
   search.push(squares[STARTI][STARTJ]);
@@ -398,12 +398,15 @@ function depthFirst(squares, interval) {
       //found the node, send path
       let finalPath = backTrace(node);
       displayPath(finalPath);
+      setButtonsOn();
     } else {
       let neighbors = findNeighbors(node, squares, search);
       search = search.concat(neighbors); // add neighbors to list if not wall, or already visited
     }
     if (search.length === 0) {
       alert("No path found");
+      setButtonsOff();
+      clearInterval(step);
     }
   }, interval);
 }
@@ -442,12 +445,31 @@ function getCode(alg) {
   return code[alg];
 }
 
+/* sets the important buttons to disabled */
+function setButtonsOff() {
+  toggleStart = false;
+  toggleEnd = false;
+  document.getElementById("setStart").disabled = true;
+  document.getElementById("setEnd").disabled = true;
+  document.getElementById("start").disabled = true;
+  document.getElementById("randWalls").disabled = true;
+}
+
+/* sets the important buttons to disabled */
+function setButtonsOn() {
+  toggleStart = false;
+  toggleEnd = false;
+  document.getElementById("setStart").disabled = false;
+  document.getElementById("setEnd").disabled = false;
+  document.getElementById("start").disabled = false;
+  document.getElementById("randWalls").disabled = false;
+}
+
 /*
  * resets the board by resetting color and visited.
  */
 function reset(squares) {
-  toggleStart = false;
-  toggleEnd = false;
+  setButtonsOn();
   if (squares) {
     for (let i = 0; i < GRID_SIZE; i++) {
       for (let j = 0; j < GRID_SIZE; j++) {
@@ -481,14 +503,14 @@ $(function() {
 
   //add random walls
   $("#randWalls").click(function() {
+    setButtonsOn();
     reset(squares);
     randomWalls(squares);
   });
 
   //changes description and pseudo code when user changes algorithms
   $("#algoSelect").change(function() {
-    toggleStart = false;
-    toggleStart = false;
+    setButtonsOn();
     let alg = $("#algoSelect").val();
     $("#description").text(getDescriptions(alg));
     $("#code").text(getCode(alg));
@@ -496,10 +518,7 @@ $(function() {
 
   //resets board and stops currently running algorithm
   $("#clear").click(function() {
-    document.getElementById("setStart").disabled = false;
-    document.getElementById("setEnd").disabled = false;
-    toggleStart = false;
-    toggleStart = false;
+    setButtonsOn();
     if (intervalId) {
       clearInterval(intervalId);
     }
@@ -517,8 +536,7 @@ $(function() {
   //starts running algorithm and displays
   $("#start").click(function() {
     let interval = parseInt($("#interval").val());
-    toggleStart = false;
-    toggleStart = false;
+    setButtonsOn();
     reset(squares);
     let alg = $("#algoSelect").val();
     let pathFunction = getAlgorithms(alg);
