@@ -179,25 +179,34 @@ function createGrid(squares) {
       squares[i][j].cell.addEventListener(
         "click",
         function(event) {
-          //Check squares at i,j to see if its already a wall/start/end
           if (toggleStart) {
-            squares[STARTI][STARTJ].type = "Empty";
-            squares[STARTI][STARTJ].cell.bgColor = DEFAULT_COLOR;
-            squares[i][j].type = "Start";
-            squares[i][j].cell.bgColor = START_COLOR;
-            STARTI = i;
-            STARTJ = j;
-            toggleStart = false;
+            if (squares[i][j].type !== "End") {
+              squares[STARTI][STARTJ].type = "Empty";
+              squares[STARTI][STARTJ].cell.bgColor = DEFAULT_COLOR;
+              squares[i][j].type = "Start";
+              squares[i][j].cell.bgColor = START_COLOR;
+              STARTI = i;
+              STARTJ = j;
+              toggleStart = false;
+            }
+          } else if (squares[i][j].type === "Start") {
+            toggleStart = true;
           }
           if (toggleEnd) {
-            squares[ENDI][ENDJ].type = "Empty";
-            squares[i][j].type = "End";
-            squares[ENDI][ENDJ].cell.bgColor = DEFAULT_COLOR;
-            squares[i][j].cell.bgColor = END_COLOR;
-            ENDI = i;
-            ENDJ = j;
-            toggleEnd = false;
+            if (squares[i][j].type !== "Start") {
+              squares[ENDI][ENDJ].type = "Empty";
+              squares[i][j].type = "End";
+              squares[ENDI][ENDJ].cell.bgColor = DEFAULT_COLOR;
+              squares[i][j].cell.bgColor = END_COLOR;
+              ENDI = i;
+              ENDJ = j;
+              toggleEnd = false;
+            }
+          } else if (squares[i][j].type === "End") {
+            toggleEnd = true;
           }
+
+          //Check squares at i,j to see if its already a wall/start/end
           if (squares[i][j].type === "Wall") {
             squares[i][j].type = "Empty";
             squares[i][j].cell.bgColor = DEFAULT_COLOR;
