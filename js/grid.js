@@ -80,6 +80,25 @@ class square {
 
   set type(t) {
     this._type = t;
+    if (this._cell) {
+      switch (t) {
+        case "Empty":
+          this._cell.bgColor = DEFAULT_COLOR;
+          return;
+        case "Wall":
+          this._cell.bgColor = WALL_COLOR;
+          return;
+        case "Start":
+          this._cell.bgColor = START_COLOR;
+          return;
+        case "End":
+          this._cell.bgColor = END_COLOR;
+          return;
+        default:
+          this._cell.bgColor = DEFAULT_COLOR;
+          return;
+      }
+    }
   }
 
   set visited(v) {
@@ -109,9 +128,7 @@ class square {
  */
 function setStartAndEnd(squares) {
   squares[STARTI][STARTJ].type = "Start";
-  squares[STARTI][STARTJ].cell.bgColor = START_COLOR;
   squares[ENDI][ENDJ].type = "End";
-  squares[ENDI][ENDJ].cell.bgColor = END_COLOR;
 }
 
 /*
@@ -131,7 +148,6 @@ function randomWalls(squares) {
     let randCol = randInt(0, GRID_SIZE - 1);
     if (squares[randRow][randCol].type === "Empty") {
       squares[randRow][randCol].type = "Wall";
-      squares[randRow][randCol].cell.bgColor = WALL_COLOR;
       numWalls--;
     }
   }
@@ -182,9 +198,7 @@ function createGrid(squares) {
           if (toggleStart) {
             if (squares[i][j].type !== "End") {
               squares[STARTI][STARTJ].type = "Empty";
-              squares[STARTI][STARTJ].cell.bgColor = DEFAULT_COLOR;
               squares[i][j].type = "Start";
-              squares[i][j].cell.bgColor = START_COLOR;
               STARTI = i;
               STARTJ = j;
               toggleStart = false;
@@ -196,8 +210,6 @@ function createGrid(squares) {
             if (squares[i][j].type !== "Start") {
               squares[ENDI][ENDJ].type = "Empty";
               squares[i][j].type = "End";
-              squares[ENDI][ENDJ].cell.bgColor = DEFAULT_COLOR;
-              squares[i][j].cell.bgColor = END_COLOR;
               ENDI = i;
               ENDJ = j;
               toggleEnd = false;
@@ -209,10 +221,8 @@ function createGrid(squares) {
           //Check squares at i,j to see if its already a wall/start/end
           if (squares[i][j].type === "Wall") {
             squares[i][j].type = "Empty";
-            squares[i][j].cell.bgColor = DEFAULT_COLOR;
           } else if (squares[i][j].type === "Empty") {
             squares[i][j].type = "Wall";
-            squares[i][j].cell.bgColor = WALL_COLOR;
           }
         },
         false
@@ -458,8 +468,6 @@ function getCode(alg) {
 function setButtonsOff() {
   toggleStart = false;
   toggleEnd = false;
-  document.getElementById("setStart").disabled = true;
-  document.getElementById("setEnd").disabled = true;
   document.getElementById("start").disabled = true;
   document.getElementById("randWalls").disabled = true;
 }
@@ -468,8 +476,6 @@ function setButtonsOff() {
 function setButtonsOn() {
   toggleStart = false;
   toggleEnd = false;
-  document.getElementById("setStart").disabled = false;
-  document.getElementById("setEnd").disabled = false;
   document.getElementById("start").disabled = false;
   document.getElementById("randWalls").disabled = false;
 }
