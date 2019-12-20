@@ -68,9 +68,6 @@ $(function() {
   //resets board and stops currently running algorithm
   $("#clear").click(function() {
     setButtonsOn();
-    if (intervalId) {
-      clearInterval(intervalId);
-    }
     squares = null;
     squares = [];
     for (let i = 0; i < GRID_SIZE; i++) {
